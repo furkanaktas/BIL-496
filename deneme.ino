@@ -55,6 +55,7 @@ String result;
 void setup() {
   //Serial.begin(9600);
   //Serial.println(F("DHT11 test!"));
+  delay(500);
 
   Serial.begin(115200);  // wifi
 
@@ -84,7 +85,7 @@ void setup() {
   while(!isOK){
     // Reading temperature or humidity takes about 250 milliseconds!
     // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
-     humidity = dht.readHumidity();
+    humidity = dht.readHumidity();
     // Read temperature as Celsius (the default)
     temperature= dht.readTemperature();
   
@@ -117,25 +118,25 @@ void setup() {
 
 */    
 
-}
+  //ADC_MODE(ADC_VCC);  // vcc read mode
+  //float vcc = ESP.getVcc();     //voltaj ölçmek için
 
-
-
-
-WiFiClient client;
-char* host = "192.168.61.61";
-const uint16_t port = 8080;
-
-int num =0;
-int sleepTime = 40e6;
-unsigned long stuckTime = millis();
-void loop() {
-
+  WiFiClient client;
+  char* host = "192.168.61.61";
+  const uint16_t port = 8080;
   
+  int num =0;
+  int sleepTime = 40e6;
+  int delayTime =100;
+  unsigned long stuckTime = millis();
+
   while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
+    delay(delayTime);
     Serial.println("try to connect WiFi...");
-    if (millis() - stuckTime >= 180000){
+    //if (millis() - stuckTime >= 180000){
+    if (millis() - stuckTime >= 10000){
+      //digitalWrite(DHTPIN, LOW);
+      //delay(500);
       ESP.deepSleep(sleepTime);  
     }
     //Serial.println(String("result size : " + String(result.length()))); // size 35
@@ -159,7 +160,7 @@ void loop() {
       Serial.println("if Sleep...");
       ESP.deepSleep(sleepTime);  
     }
-    delay(1000);
+    delay(delayTime);
   }
   Serial.println("Connected to server successful!");
   
@@ -173,7 +174,7 @@ void loop() {
       delay(1000);
       ESP.deepSleep(sleepTime);  
     }
-    delay(500);
+    delay(delayTime);
   }
       
 
@@ -213,10 +214,13 @@ void loop() {
         Serial.println("if Sleep...");
         ESP.deepSleep(sleepTime);  
       }
-      delay(1000);  
+      delay(delayTime);  
     }  // wait until connection lost
-
-    Serial.println("Sleep...");
-    ESP.deepSleep(sleepTime);    // then deep sleep
   }  
+  Serial.println("Sleep...");
+  ESP.deepSleep(sleepTime);    // then deep sleep
+
+
 }
+
+void loop() {}
