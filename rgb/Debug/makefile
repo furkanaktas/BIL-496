@@ -10,7 +10,7 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
-"./LCD.obj" \
+"./display.obj" \
 "./main.obj" \
 "./tm4c123gh6pm_startup_ccs.obj" \
 "./utils/cmdline.obj" \
@@ -162,8 +162,8 @@ rgb.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "LCD.obj" "main.obj" "tm4c123gh6pm_startup_ccs.obj" "utils\cmdline.obj" "utils\uartstdio.obj" 
-	-$(RM) "LCD.d" "main.d" "tm4c123gh6pm_startup_ccs.d" "utils\cmdline.d" "utils\uartstdio.d" 
+	-$(RM) "display.obj" "main.obj" "tm4c123gh6pm_startup_ccs.obj" "utils\cmdline.obj" "utils\uartstdio.obj" 
+	-$(RM) "display.d" "main.d" "tm4c123gh6pm_startup_ccs.d" "utils\cmdline.d" "utils\uartstdio.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

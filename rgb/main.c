@@ -3,7 +3,7 @@
 #include<stdbool.h>
 
 #include"inc/hw_memmap.h" // periperhals base adresses
-#include"inc/hw_ints.h" // interrupts base adresses
+#include"inc/hw_ints.h" // interrupts 3 adresses
 
 #include"driverlib/sysctl.h"
 #include"driverlib/gpio.h"  // gpio periperhals,  uart gpio üzerinden çalýþýr
@@ -38,11 +38,13 @@
 #include "utils/cmdline.h"
 
 
-#include "LCD.h"
+//#include "LCD.h"
+#include "display.h"
+
 
 #include "inc/TM4C123GH6PM.h"
 
-
+void btHandler(void);
 
 static char ReceivedData[512];
 static char localDB[512][36];
@@ -118,7 +120,7 @@ void InitUART(void)
 }
 
 void InitESPUART(void)
-{
+{   // B0, B1 pins provides 3V
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
     GPIOPinConfigure(GPIO_PB0_U1RX);
@@ -128,6 +130,37 @@ void InitESPUART(void)
     UARTConfigSetExpClk(UART1_BASE, 16000000, 115200, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
     UARTEnable(UART1_BASE);
 
+}
+
+
+void InitBToothUART(void)
+{   // D4, D5 pins provides 3V
+    UARTprintf("bt in \n");
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART3);
+    GPIOPinConfigure(GPIO_PC6_U3RX);
+    GPIOPinConfigure(GPIO_PC7_U3TX);
+    GPIOPinTypeUART(GPIO_PORTC_BASE, GPIO_PIN_6 | GPIO_PIN_7);
+
+    IntDisable(INT_UART3);
+
+    uint32_t uartBase = UART3_BASE;
+    UARTDisable(uartBase);
+
+
+    UARTClockSourceSet(uartBase, UART_CLOCK_PIOSC);
+    UARTConfigSetExpClk(uartBase, 16000000, 115200, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
+    //UARTConfigSetExpClk(uartBase, SysCtlClockGet(), 9600, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
+
+
+    UARTFIFODisable(uartBase);
+    UARTIntEnable(uartBase, UART_INT_RX | UART_INT_RT);
+    UARTIntRegister(uartBase, btHandler);
+
+    UARTEnable(uartBase);
+    IntEnable(INT_UART3);
+
+    UARTprintf("bt out \n");
 }
 
 int SearchIndexOf(char src[], char str[])
@@ -873,6 +906,67 @@ void setSystem(){
 }
 
 
+void sendToBT(char *data){
+
+    UARTprintf("send in \n");
+    uint32_t uartBase = UART3_BASE;
+
+    while(UARTBusy(uartBase));
+    while(*data != '\0')
+    {
+        UARTCharPut(uartBase, *data++);
+    }
+    UARTCharPut(uartBase, '\r'); //CR
+    UARTCharPut(uartBase, '\n'); //LF
+
+    UARTprintf("send out \n");
+
+}
+
+bool isConnection = false, cMode = false, sendTime = false;
+
+void btHandler(void){
+
+    UARTprintf("enter handler  \n");
+
+    char msg[20];
+    int intStatus;
+    uint32_t uartBase = UART3_BASE;
+
+    intStatus = UARTIntStatus(uartBase, true);
+    memset(msg, '\0', sizeof(msg));
+
+
+    int i =0;
+    isConnection = true;
+    while(UARTCharsAvail(uartBase))
+    {
+        msg[i++] = UARTCharGet(uartBase);
+        UARTprintf("uart flushing...\n");
+    }
+
+    UARTprintf("__msg :  %s \n",msg);
+
+    if(SearchIndexOf(msg, "cMode=0") != -1){
+        runMode = 0;
+        cMode = true;
+        //sendToBT("mode change 0");
+    }
+    else if(SearchIndexOf(msg, "cMode=1") != -1){
+        runMode = 1;
+        cMode = true;
+        //sendToBT("mode change 1");
+    }
+    else{
+        sendTime = true;
+        //sendToBT("lololo");
+    }
+
+
+    UARTprintf("out handler  \n");
+    UARTIntClear(uartBase, intStatus);
+}
+
 /*
  *  verileri localdeki deðiþkende tut.
  *  gelen baðlantýdan mode deðiþtirme
@@ -882,6 +976,7 @@ void setSystem(){
  *
  * */
 
+
 int main(void)
 {
 
@@ -889,18 +984,22 @@ int main(void)
     //SysCtlClockSet(SYSCTL_SYSDIV_2_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
     //SysCtlClockSet(SYSCTL_SYSDIV_4|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
     SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
+    //SysCtlClockSet(SYSCTL_SYSDIV_8 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
 
     timerInit();
     InitUART();
     InitESPUART();
     //Lcd_init();
+    initLCD();
+
+    //InitBToothUART();   // init bluetooth
     UARTprintf("Execute!\r\n");
 
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF); // ledler ve switch tuþlarý F portunda
 
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);  // 1 2 3 pinler , kýrmýzý blue green
-    GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
+    GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
 
     delayMs(1000);
 
@@ -939,6 +1038,18 @@ int main(void)
 
         //UARTprintf("%ul  \n",stuckTime);
 
+        if(isConnection){
+
+            if(cMode){
+                setSystem();
+                cMode = false;
+            }
+            if(sendTime){
+                sendToBT("oldu mu laaayn ??");
+                sendTime = false;
+            }
+            isConnection = false;
+        }
 
         if(!isESPworks()){ // ESP den 30s  cevap alýnamadýysa - ESP yi restart
             setSystem();
@@ -1048,8 +1159,6 @@ int main(void)
                 }
 
 
-
-
                 delayMs(1000);
                 createServer();
 
@@ -1085,12 +1194,29 @@ int main(void)
         delayMs(1000);
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1| GPIO_PIN_2| GPIO_PIN_3, 0);
         delayMs(1000);
-/*
+
+
+        printLCD("zaaaaaaaa");
+        setCursorPositionLCD(1,0);
+        printLCD("akjsdhsasah");
+        delayMs(3000);
+
+        clearLCD();
+        printLCD("16 characters");
+        setCursorPositionLCD(1,0);
+        printLCD("2 lines");
+        delayMs(3000);
+
+        clearLCD();
+        /*
         Lcd_Goto(1,1);
         Lcd_Puts("Furkan");
         Lcd_Goto(2,5);
         Lcd_Puts("AKTAS ");
-*/
+        delayMs(3000);
+        Lcd_Temizle();
+        */
+
     }
 
 

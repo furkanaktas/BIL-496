@@ -34,7 +34,7 @@ main.obj: C:/Program\ Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/driverlib/inte
 main.obj: C:/Program\ Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/inc/hw_nvic.h
 main.obj: C:/Program\ Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/utils/uartstdio.h
 main.obj: C:/Program\ Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/utils/cmdline.h
-main.obj: ../LCD.h
+main.obj: ../display.h
 main.obj: C:/Program\ Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/inc/TM4C123GH6PM.h
 
 ../main.c: 
@@ -71,5 +71,5 @@ C:/Program\ Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/driverlib/interrupt.h:
 C:/Program\ Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/inc/hw_nvic.h: 
 C:/Program\ Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/utils/uartstdio.h: 
 C:/Program\ Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/utils/cmdline.h: 
-../LCD.h: 
+../display.h: 
 C:/Program\ Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/inc/TM4C123GH6PM.h: 

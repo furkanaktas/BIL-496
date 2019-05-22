@@ -12,32 +12,32 @@ LIB_SRCS += \
 C:/Program\ Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib 
 
 C_SRCS += \
-../LCD.c \
+../display.c \
 ../main.c \
 ../tm4c123gh6pm_startup_ccs.c 
 
 C_DEPS += \
-./LCD.d \
+./display.d \
 ./main.d \
 ./tm4c123gh6pm_startup_ccs.d 
 
 OBJS += \
-./LCD.obj \
+./display.obj \
 ./main.obj \
 ./tm4c123gh6pm_startup_ccs.obj 
 
 OBJS__QUOTED += \
-"LCD.obj" \
+"display.obj" \
 "main.obj" \
 "tm4c123gh6pm_startup_ccs.obj" 
 
 C_DEPS__QUOTED += \
-"LCD.d" \
+"display.d" \
 "main.d" \
 "tm4c123gh6pm_startup_ccs.d" 
 
 C_SRCS__QUOTED += \
-"../LCD.c" \
+"../display.c" \
 "../tm4c123gh6pm_startup_ccs.c" 
 
 
