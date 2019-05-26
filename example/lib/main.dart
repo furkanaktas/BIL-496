@@ -11,8 +11,6 @@ import 'dart:math' as math;
 
 //import 'package:charts_flutter/flutter.dart' as charts;
 
-
-
 void main() {
   runApp(new MaterialApp(
     theme: new ThemeData(
@@ -21,7 +19,7 @@ void main() {
     home: new MyApp(),
     routes: <String, WidgetBuilder>{
       "/Charts": (BuildContext context) =>
-          new Charts(_MyAppState._createRandomData(),true),
+          new Charts(_MyAppState._createRandomData(), true),
       //add more routes here
     },
   ));
@@ -42,7 +40,6 @@ enum BTstatus { start, mode0, mode1, send }
 ///
 ///
 class _MyAppState extends State<MyApp> {
-
   FlutterBluetoothSerial bluetooth = FlutterBluetoothSerial.instance;
 
   List<BluetoothDevice> _devices = [];
@@ -53,9 +50,13 @@ class _MyAppState extends State<MyApp> {
   BTstatus _btStatus = BTstatus.start;
   List<String> _ghDatas = new List();
   List<String> _ghDatasOnline = new List();
+  var _lastDatas = <Widget>[];
 
   Status _stat = Status.search;
-  bool isOffline = false;
+  bool _isOnline = false;
+  Sera _lastData0 = new Sera(0, 22.2, 34.4, 5),
+      _lastData1 = new Sera(1, 22.2, 34.4, 5),
+      _lastData2 = new Sera(2, 22.2, 34.4, 5);
 
   ///
   ///
@@ -64,7 +65,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
 
-    isOffline = false;
+    _isOnline = false;
 
     bluetooth.onStateChanged().listen((state) {
       switch (state) {
@@ -103,28 +104,22 @@ class _MyAppState extends State<MyApp> {
     bluetooth.onRead().listen((msg) {
       setState(() {
         if (_btStatus == BTstatus.start) {
-
           _btResponse.text += msg;
           if (_btResponse.text.contains("\r\n")) {
             //_btResponse.text += msg;
             if (_btResponse.text.contains("0\r\n")) {
-              isOffline = false;
+              _isOnline = false;
               //print("anan");
-            }
-            else if(_btResponse.text.contains("1\r\n")) {
-              isOffline = true;
+            } else if (_btResponse.text.contains("1\r\n")) {
+              _isOnline = true;
               //print("anan");
-            }
-            else {
+            } else {
               _showAlert("Yanlış cihaza bağlısınız.");
               _disconnect();
             }
             _btResponse.clear();
           }
-
-
         } else if (_btStatus == BTstatus.send) {
-
           _btResponse.text += msg;
           if (_btResponse.text.contains("\r\n")) {
             //_btResponse.text += msg;
@@ -133,10 +128,7 @@ class _MyAppState extends State<MyApp> {
             print(_ghDatas.length);
             _btResponse.clear();
           }
-
         } else if (_btStatus == BTstatus.mode0) {
-
-
           _btResponse.text += msg;
           if (_btResponse.text.contains("\r\n")) {
             //_btResponse.text += msg;
@@ -145,12 +137,10 @@ class _MyAppState extends State<MyApp> {
               //_disconnect();
               //print("anan");
             }
-            isOffline = false;
+            _isOnline = false;
             _btResponse.clear();
           }
-
         } else {
-
           _btResponse.text += msg;
           if (_btResponse.text.contains("\r\n")) {
             //_btResponse.text += msg;
@@ -159,11 +149,9 @@ class _MyAppState extends State<MyApp> {
               //_disconnect();
               //print("anan");
             }
-            isOffline=true;
+            _isOnline = true;
             _btResponse.clear();
           }
-
-
         }
       });
     });
@@ -171,41 +159,6 @@ class _MyAppState extends State<MyApp> {
     //initPlatformState();
   }
 
-
-
-  Widget _setBTButton() {
-    if (_stat == Status.search) {
-      return new FloatingActionButton(
-          mini: true,
-          child: new Icon(
-            Icons.search,
-            size: 20,
-          ),
-          onPressed: _scanBTDevices);
-    } else if (_stat == Status.connect) {
-      return new Row(
-        children: <Widget>[
-          new RaisedButton(child: new Text("Bağlan"), onPressed: _connect),
-          new FloatingActionButton(
-              mini: true,
-              child: new Icon(
-                Icons.search,
-                size: 20,
-              ),
-              onPressed: _scanBTDevices)
-        ],
-      );
-    } else {
-      return new FloatingActionButton(
-          mini: true,
-          child: new Icon(
-            Icons.stop,
-            color: Colors.red,
-            size: 20,
-          ),
-          onPressed: _disconnect);
-    }
-  }
 
   Future _scanBTDevices() async {
     bool key = await bluetooth.isOn, key2 = !(await bluetooth.isConnected);
@@ -267,75 +220,134 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  Future _getGHDatas() async{
+  Future _getGHDatas() async {
     bool key = await bluetooth.isConnected;
-    if(key){
+    if (key) {
       bluetooth.write("send").then((onValue) {
         setState(() {
           _btStatus = BTstatus.send;
         });
       });
-    }else{
+    } else {
       _showAlert("Bağlı değilsiniz.");
     }
-
   }
-
-
-  /*
-  Future<http.Response> _getGHDatasFromServer(){
-
-    return http.get('http://23.97.238.10:5000/?ghID=0');
-
-  }
-
-*/
 
 
   Future<GHhttpDataList> _getGHDatasFromServer() async {
-    final response =
-    await http.get('http://23.97.238.10:5000/?ghID=0');
+    final response = await http.get('http://23.97.238.10:5000');
+    //await http.get('http://23.97.238.10:5000/?ghID=0');
 
     if (response.statusCode == 200) {
       // If server returns an OK response, parse the JSON
       GHhttpDataList temp = GHhttpDataList.fromJson(json.decode(response.body));
 
       int size = temp.ghDatas.length;
-      for(int i=0; i<size; ++i){
-        _ghDatasOnline.insert(i, temp.ghDatas[i].toString());
+      bool key0 = false, key1 = false, key2 = false;
+      String data;
+      for (int i = 0; i < size; ++i) {
+        data = temp.ghDatas[i].toString();
+        _ghDatasOnline.insert(i, data);
+
+        List<String> tempStr = data.split("&");
+        if (!key0 && data[0] == "0") {
+          setState(() {
+            _lastData0 = new Sera(
+                int.parse(tempStr[0]),
+                double.parse(tempStr[1]).roundToDouble(),
+                double.parse(tempStr[2]).roundToDouble(),
+                int.parse(tempStr[3]));
+          });
+          key0 = true;
+        } else if (!key1 && data[0] == "1") {
+          setState(() {
+            _lastData1 = new Sera(
+                int.parse(tempStr[0]),
+                double.parse(tempStr[1]).roundToDouble(),
+                double.parse(tempStr[2]).roundToDouble(),
+                int.parse(tempStr[3]));
+          });
+          key1 = true;
+        } else if (!key2 && data[0] == "2") {
+          setState(() {
+            _lastData2 = new Sera(
+                int.parse(tempStr[0]),
+                double.parse(tempStr[1]),
+                double.parse(tempStr[2]).roundToDouble(),
+                int.parse(tempStr[3]));
+          });
+          key2 = true;
+        }
+        //print(temp.ghDatas[i].toString());
       }
 
       return temp;
     } else {
       // If that response was not OK, throw an error.
-      throw Exception('Failed to load post');
+      //throw Exception('Failed to load post');
+      _showAlert("Veriler alınamadı. İnternet bağlantısını kontrol ediniz.");
     }
+
+    //await _getLastDatas();
   }
 
-
-  Future _changeRunMode() async{
+  Future _changeRunMode() async {
     bool key = await bluetooth.isConnected;
-    if(key){
-      if(isOffline){      // çalışmayabilir, test et,
+    if (key) {
+      if (_isOnline) {
+        // çalışmayabilir, test et,
         bluetooth.write("mode=1").then((onValue) {
           setState(() {
             _btStatus = BTstatus.mode1;
           });
         });
-      }else{
+      } else {
         bluetooth.write("mode=0").then((onValue) {
           setState(() {
             _btStatus = BTstatus.mode0;
           });
         });
       }
-    }else{
+    } else {
       _showAlert("Bağlı değilsiniz.");
       setState(() {
         //isOffline = !isOffline;
       });
     }
+  }
 
+  Widget _setBTButton() {
+    if (_stat == Status.search) {
+      return new FloatingActionButton(
+          mini: true,
+          child: new Icon(
+            Icons.search,
+            size: 20,
+          ),
+          onPressed: _scanBTDevices);
+    } else if (_stat == Status.connect) {
+      return new Row(
+        children: <Widget>[
+          new RaisedButton(child: new Text("Bağlan"), onPressed: _connect),
+          new FloatingActionButton(
+              mini: true,
+              child: new Icon(
+                Icons.search,
+                size: 20,
+              ),
+              onPressed: _scanBTDevices)
+        ],
+      );
+    } else {
+      return new FloatingActionButton(
+          mini: true,
+          child: new Icon(
+            Icons.stop,
+            color: Colors.red,
+            size: 20,
+          ),
+          onPressed: _disconnect);
+    }
   }
 
   List<DropdownMenuItem<BluetoothDevice>> _getDeviceItems() {
@@ -359,20 +371,6 @@ class _MyAppState extends State<MyApp> {
       });
     }
     return items;
-  }
-
-  /// Create random data.
-  static List<GreenHouseData> _createRandomData() {
-    final random = new math.Random();
-
-    List<GreenHouseData> temp = new List();
-    for(int i =0; i<168;++i){
-      temp.add(new GreenHouseData(0,new DateTime(2019, 5, i+1), random.nextDouble()*40, random.nextDouble()*60, random.nextInt(100)%5));
-      temp.add(new GreenHouseData(1,new DateTime(2019, 5, i+1), random.nextDouble()*30, random.nextDouble()*50, random.nextInt(100)%5));
-      temp.add(new GreenHouseData(2,new DateTime(2019, 5, i+1), random.nextDouble()*50, random.nextDouble()*70, random.nextInt(100)%5));
-    }
-
-    return temp;
   }
 
   Widget _BTImage() {
@@ -437,6 +435,35 @@ class _MyAppState extends State<MyApp> {
         });
   }
 
+  /// Create random data.
+  static List<GreenHouseData> _createRandomData() {
+    final random = new math.Random();
+
+    List<GreenHouseData> temp = new List();
+    for (int i = 0; i < 168; ++i) {
+      temp.add(new GreenHouseData(
+          0,
+          new DateTime(2019, 5, i + 1),
+          random.nextDouble() * 40,
+          random.nextDouble() * 60,
+          random.nextInt(100) % 5));
+      temp.add(new GreenHouseData(
+          1,
+          new DateTime(2019, 5, i + 1),
+          random.nextDouble() * 30,
+          random.nextDouble() * 50,
+          random.nextInt(100) % 5));
+      temp.add(new GreenHouseData(
+          2,
+          new DateTime(2019, 5, i + 1),
+          random.nextDouble() * 50,
+          random.nextDouble() * 70,
+          random.nextInt(100) % 5));
+    }
+
+    return temp;
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -492,11 +519,11 @@ class _MyAppState extends State<MyApp> {
                             ),
                             Center(
                               child: new Switch(
-                                  value: isOffline,
+                                  value: _isOnline,
                                   onChanged: (bool value) {
                                     setState(() {
-                                      isOffline = value;
-                                      print(isOffline);
+                                      _isOnline = value;
+                                      print(_isOnline);
                                     });
                                     _changeRunMode();
                                   }),
@@ -536,15 +563,17 @@ class _MyAppState extends State<MyApp> {
                                       'Verileri Al',
                                       style: TextStyle(fontSize: 20),
                                     ),
-                                    onPressed: () {(isOffline == true) ? _getGHDatasFromServer():_getGHDatas();}),
+                                    onPressed: () {
+                                      (_isOnline == true)
+                                          ? _getGHDatasFromServer()
+                                          : _getGHDatas();
+                                    }),
                               ),
                             ],
                           ),
                         ],
                       ),
                     )),
-
-
                 Padding(
                   padding: EdgeInsets.only(
                       top: 100, left: 25, right: 25, bottom: 10),
@@ -561,11 +590,28 @@ class _MyAppState extends State<MyApp> {
             ))));
   }
 
-  _showDatas(){
+
+  _showDatas() {
+    setState(() {
+      _lastDatas.clear();
+    });
+
+    if (_isOnline) {
+      if (_lastData0 != null) _lastDatas.add(_lastData0);
+
+      if (_lastData1 != null) _lastDatas.add(_lastData1);
+
+      if (_lastData2 != null) _lastDatas.add(_lastData2);
+    } else {
+      _lastDatas.add(_lastData0);
+      _lastDatas.add(_lastData1);
+      _lastDatas.add(_lastData2);
+    }
 
     return new Column(
-        children: <Widget>[
-/*
+      children:
+          _lastDatas, /* <Widget>[
+
           new Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -602,18 +648,17 @@ class _MyAppState extends State<MyApp> {
               ),
             ],
           ),
-          */
+
+
+
           new Sera(0, 22.2, 34.4, 5),
           new Sera(1, 22.2, 34.4, 5),
           new Sera(2, 22.2, 34.4, 5),
         ],
+        */
     );
-
   }
-
-
 }
-
 
 class GHhttpDataList {
   final List<GHhttpData> ghDatas;
@@ -623,13 +668,10 @@ class GHhttpDataList {
   });
 
   factory GHhttpDataList.fromJson(List<dynamic> parsedJson) {
-
     List<GHhttpData> datas = new List<GHhttpData>();
-    datas = parsedJson.map((i)=>GHhttpData.fromJson(i)).toList();
+    datas = parsedJson.map((i) => GHhttpData.fromJson(i)).toList();
 
-    return new GHhttpDataList(
-        ghDatas: datas
-    );
+    return new GHhttpDataList(ghDatas: datas);
   }
 }
 
@@ -642,16 +684,23 @@ class GHhttpData {
   GHhttpData({this.id, this.temp, this.humidity, this.level});
 
   @override
-  String toString(){
-    return id.toString()+ "&&"+ temp.toString()+ "&&"+ humidity.toString()+"&&"+ level.toString();
+  String toString() {
+    //return "?ghID="+id.toString()+ "&temp"+temp.toString()+ "&hum"+ humidity.toString()+"&level"+ level.toString();
+    return id.toString() +
+        "&" +
+        temp.toString() +
+        "&" +
+        humidity.toString() +
+        "&" +
+        level.toString();
   }
 
   factory GHhttpData.fromJson(Map<String, dynamic> json) {
     return GHhttpData(
-        id: json['ghId'],
-        temp: json['temperature'],
-        humidity: json['humidity'],
-        level: json['level'],
+      id: json['ghId'],
+      temp: json['temperature'],
+      humidity: json['humidity'],
+      level: json['level'],
     );
   }
 }
