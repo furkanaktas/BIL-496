@@ -8,12 +8,12 @@ Developped with FLUTTER.
 
 screen1 
 
-![alt text](furkanaktas/bil-496/blob/master/images/mobile_1.jpg)
+![alt text](https://github.com/furkanaktas/bil-496/blob/master/images/mobile_1.jpg)
 
 
 screen2
 
-![alt text](furkanaktas/bil-496/blob/master/images/mobile_2.jpg)
+![alt text](https://github.com/furkanaktas/bil-496/blob/master/images/mobile_2.jpg)
 
 ## Getting Started
 
