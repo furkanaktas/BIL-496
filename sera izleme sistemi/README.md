@@ -8,12 +8,12 @@ Developped with FLUTTER.
 
 screen1 
 
-![alt text](images/mobile_1.jpg)
+![alt text](/tree/master/images/mobile_1.jpg)
 
 
 screen2
 
-![alt text](images/mobile_2.jpg)
+![alt text](/tree/master/images/mobile_2.jpg)
 
 ## Getting Started
 
