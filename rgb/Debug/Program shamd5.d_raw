@@ -1,9 +1,0 @@
-shamd5.obj: C:/Program Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/driverlib/shamd5.c
-shamd5.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/stdbool.h
-shamd5.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/stdint.h
-shamd5.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/stdint.h
-shamd5.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/cdefs.h
-shamd5.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/_types.h
-shamd5.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/machine/_types.h
-shamd5.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/machine/_stdint.h
-shamd5.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/_stdint.h

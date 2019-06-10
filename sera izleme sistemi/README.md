@@ -1,6 +1,19 @@
-# flutter_bluetooth_serial_example
+# mobile_app_flutter
 
-Demonstrates how to use the flutter_bluetooth_serial plugin.
+Mobile app to manage system and see infos.
+
+Developped with FLUTTER. 
+
+(intellij project)
+
+screen1 
+
+![alt text](images/mobile_1.jpg)
+
+
+screen2
+
+![alt text](images/mobile_2.jpg)
 
 ## Getting Started
 

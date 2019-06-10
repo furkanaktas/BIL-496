@@ -1,9 +1,0 @@
-watchdog.obj: C:/Program Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/driverlib/watchdog.c
-watchdog.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/stdbool.h
-watchdog.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/stdint.h
-watchdog.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/stdint.h
-watchdog.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/cdefs.h
-watchdog.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/_types.h
-watchdog.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/machine/_types.h
-watchdog.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/machine/_stdint.h
-watchdog.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/_stdint.h

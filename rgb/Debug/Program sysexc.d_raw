@@ -1,9 +1,0 @@
-sysexc.obj: C:/Program Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/driverlib/sysexc.c
-sysexc.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/stdbool.h
-sysexc.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/stdint.h
-sysexc.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/stdint.h
-sysexc.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/cdefs.h
-sysexc.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/_types.h
-sysexc.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/machine/_types.h
-sysexc.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/machine/_stdint.h
-sysexc.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/_stdint.h

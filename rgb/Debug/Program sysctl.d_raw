@@ -1,9 +1,0 @@
-sysctl.obj: C:/Program Files/ti/ccs830/TivaWare_C_Series-2.1.4.178/driverlib/sysctl.c
-sysctl.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/stdbool.h
-sysctl.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/stdint.h
-sysctl.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/stdint.h
-sysctl.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/cdefs.h
-sysctl.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/_types.h
-sysctl.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/machine/_types.h
-sysctl.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/machine/_stdint.h
-sysctl.obj: C:/Program Files/ti/ccs830/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include/sys/_stdint.h
