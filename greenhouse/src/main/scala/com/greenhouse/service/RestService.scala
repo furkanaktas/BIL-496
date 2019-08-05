@@ -16,7 +16,7 @@ class RestService(ghService: GreenhouseService)
   extends SprayJsonSupport {
 
 
-  // wikibox CRUD endpoints
+  // greenhouse CRUD endpoints
   private val endpoints = path("") {
     get {
       parameters('ghID.as[Int]) { ghID =>
